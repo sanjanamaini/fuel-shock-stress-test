@@ -29,7 +29,13 @@ Bloomberg, CapitalIQ and PitchBook data are licensed and are never committed to 
 
 ## Status
 
-v0 scaffold (2026-07-03): repo structure, public data pipeline (Brent, WTI, US diesel from FRED), Excel unit economics model v0 with shock engine and survival grid. Baseline country assumptions are clearly labeled v0 estimates pending calibration against pipeline data and the CapitalIQ screen.
+**v0.2 (2026-07-05):** public data pipeline (Brent and WTI daily since 1986-87, US diesel weekly since 1994, all via EIA, through 2026-06-29), Excel unit economics and shock model, and a fully executed analysis notebook with real findings:
+
+- **US crude-to-pump beta, empirically calibrated: 0.36** (13-week percent-change regression, R-squared 0.51, n=1,672). This replaces a v0 guess of 0.90, retail diesel absorbs crude moves far more slowly than intuition suggests.
+- **Mean-reverting Monte Carlo on Brent** (Ornstein-Uhlenbeck, calibrated 2010-present: half-life 0.87 years, long-run mean $73/bbl), 10,000 simulated 12-month paths.
+- **Headline finding:** Brazil has a 42% chance of breaching zero EBIT margin within 12 months; the US has effectively none. Ranking (Brazil > China > India > Germany > US) is driven by each country's fuel share of revenue and margin cushion, not the size of the shock, which is identical across countries in the simulation. See `charts/03_vulnerability_ranking.png`.
+
+India, China, Germany and Brazil crude-to-pump betas and the CapitalIQ company screen are still pending (see notebook section 6 and section 3 respectively) — current results use one representative operator per country from v0 Excel assumptions, not yet the actual distribution of real companies.
 
 ## Tech
 

@@ -4,3 +4,6 @@ matplotlib>=3.7
 openpyxl>=3.1
 xlrd>=2.0
 jupyter
+nbclient
+nbconvert
+ipykernel

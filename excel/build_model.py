@@ -24,8 +24,9 @@ COUNTRIES = ["US", "India", "China", "Germany", "Brazil"]
 INPUTS = [
     ("Diesel pump price", "USD per liter", [0.95, 1.08, 1.05, 1.80, 1.10],
      "v0 estimate. Calibrate: EIA (US), PPAC (India), NDRC (China), Eurostat (Germany), ANP (Brazil)"),
-    ("Crude-to-pump beta", "pct of crude move passed to pump", [0.90, 0.50, 0.60, 0.45, 0.65],
-     "v0 estimate of tax wedge. Calibrate by regressing pump on crude, 2015 to 2025"),
+    ("Crude-to-pump beta", "pct of crude move passed to pump", [0.36, 0.50, 0.60, 0.45, 0.65],
+     "US CALIBRATED (regression of 13-week pct moves, Brent vs EIA diesel, 1994-2026, R2=0.51, beta=0.36; "
+     "2015-on subset gives 0.33). Other four still v0 estimates, calibrate with Eurostat/PPAC/NDRC/ANP or Bloomberg"),
     ("Fuel efficiency", "km per liter", [2.80, 4.00, 3.00, 3.00, 2.90],
      "v0 estimate. US class 8 approx 6.5 mpg; lighter fleet mix in India"),
     ("Annual distance", "km per truck per year", [160000, 100000, 120000, 130000, 110000],
