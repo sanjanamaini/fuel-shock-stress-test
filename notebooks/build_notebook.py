@@ -75,24 +75,18 @@ cells = [
          "plt.tight_layout()\n"
          "plt.show()"),
 
-    md("## 3. Company screen (CapitalIQ export)\n\n"
-       "Not yet provided. Drop the CIQ export at ../data/licensed/ciq_screen.xlsx (gitignored) "
-       "with: name, ticker, country, market cap, revenue, EBITDA margin, EBIT margin (FY2015 to "
-       "FY2025), cash and short-term investments, total debt, interest expense, employees, for "
-       "GICS Ground Transportation/Trucking and Air Freight and Logistics companies headquartered "
-       "in the five focus countries. Once it lands, this section applies the shock and Monte Carlo "
-       "engine to the actual distribution of company margins and cash buffers instead of one "
-       "representative operator per country, which is the upgrade that turns 'vulnerability by "
-       "country' into 'which named companies breach, and at what fleet or revenue scale.'"),
+    md("## 3. Company screen (public data, no CapitalIQ)\n\n"
+       "Sanjana does not currently have CapitalIQ access, so this project is built to be fully "
+       "reproducible on public data alone: 22 real, named, publicly listed trucking and logistics "
+       "companies across the five focus countries, financials pulled free from Yahoo Finance "
+       "(`src/fetch_company_screen.py`). Coverage is real but uneven by design: Germany's trucking "
+       "sector is mostly private (Rhenus, Dachser), so Deutsche Post DHL is the one clean public "
+       "name there, a genuine limitation of public markets, not a shortcut. CapitalIQ can be added "
+       "later as an optional upgrade for broader coverage; nothing here depends on it."),
 
-    code("import os\n"
-         "ciq_path = '../data/licensed/ciq_screen.xlsx'\n"
-         "if os.path.exists(ciq_path):\n"
-         "    ciq = pd.read_excel(ciq_path)\n"
-         "    print(ciq.shape)\n"
-         "    ciq.head()\n"
-         "else:\n"
-         "    print('ciq_screen.xlsx not found yet, section 3 is a stub until it is provided')"),
+    code("companies = pd.read_csv('../data/public/company_screen.csv')\n"
+         "print(companies.groupby('country').size())\n"
+         "companies[['ticker', 'country', 'longName', 'totalRevenue', 'operatingMargins']]"),
 
     md("## 4. Ornstein-Uhlenbeck calibration and Monte Carlo\n\n"
        "Oil mean-reverts (a shock decays back toward a long-run level), so a plain geometric "
@@ -118,16 +112,15 @@ cells = [
          "plt.tight_layout()\n"
          "plt.show()"),
 
-    md("## 5. Vulnerability ranking (headline result)\n\n"
+    md("## 5. Vulnerability ranking by country (representative operator)\n\n"
        "Each simulated price path is run through the same margin logic as the Excel ShockEngine "
        "sheet (fuel share of revenue times pass-through-adjusted price move), using v0 baseline "
-       "economics per country (see excel/Inputs). Result: Brazil has a 42 percent chance of "
-       "breaching zero EBIT margin at some point in the next 12 months; the US has effectively "
-       "none. The ranking (Brazil, China, India, Germany, US, from most to least vulnerable) "
-       "follows directly from each country's fuel share of revenue and its baseline margin "
-       "cushion, not from the size of the oil shock itself, which is identical across countries "
-       "in this simulation. That is the core finding of this project: exposure is structural, "
-       "not just about how bad the shock is."),
+       "economics for one representative operator per country (see excel/Inputs). Result: Brazil "
+       "has a 42 percent chance of breaching zero EBIT margin at some point in the next 12 months; "
+       "the US has effectively none. The ranking (Brazil, China, India, Germany, US, from most to "
+       "least vulnerable) follows directly from each country's fuel share of revenue and its "
+       "baseline margin cushion, not from the size of the oil shock itself, which is identical "
+       "across countries in this simulation."),
 
     code("rows = []\n"
          "for name, c in COUNTRIES.items():\n"
@@ -142,11 +135,42 @@ cells = [
          "result = pd.DataFrame(rows).sort_values('p_breach_ever_12mo', ascending=False)\n"
          "result"),
 
-    md("## 6. Next steps\n\n"
-       "- Calibrate crude-to-pump beta for India, China, Germany, Brazil (Eurostat oil bulletin, "
-       "PPAC, NDRC, ANP, or Bloomberg country diesel series).\n"
-       "- Ingest the CapitalIQ screen (section 3) and re-run the vulnerability ranking against "
-       "actual company margins and cash buffers, not one representative operator.\n"
+    md("## 6. Company-level survival: does scale actually protect you?\n\n"
+       "Same Monte Carlo price paths, but now applied to each of the 22 real companies' own "
+       "trailing operating margin (a real observed number) instead of one assumed country "
+       "average, while fuel share of revenue and crude-to-pump beta still come from the "
+       "country-level assumptions (`src/company_survival.py`). This is company-level margin "
+       "heterogeneity layered on a country-level shock-sensitivity model, an honest middle "
+       "ground given per-company fuel cost breakdowns are not disclosed.\n\n"
+       "**Result: 16 of 22 real public companies (73 percent) have more than a 5 percent chance "
+       "of breaching zero operating margin within 12 months.** That is the headline number the "
+       "project set out to find.\n\n"
+       "**And the more interesting finding: margin discipline predicts survival far better than "
+       "country or scale does.** Correlation between baseline margin and breach probability is "
+       "-0.75 across all 22 companies. Scale alone is a weaker, messier predictor (log-revenue "
+       "correlation -0.34 overall, -0.65 within the US-only subsample where currency does not "
+       "confound the comparison). Concretely: Old Dominion Freight Line (ODFL, 23.8 percent "
+       "margin) has zero measurable breach risk despite being mid-sized, while Knight-Swift (KNX, "
+       "similar revenue, 1.2 percent margin) has a 56 percent breach probability. **Scale only "
+       "protects when it is paired with margin discipline; size alone is not a shield.**"),
+
+    code("company_survival = pd.read_csv('../company_survival_results.csv')\n"
+         "print(f\"{(company_survival['p_breach_ever_12mo'] > 0.05).sum()} of \"\n"
+         "      f\"{len(company_survival)} companies have >5% breach probability\\n\")\n"
+         "import numpy as np\n"
+         "corr_margin = np.corrcoef(company_survival['baseline_operating_margin'],\n"
+         "                          company_survival['p_breach_ever_12mo'])[0, 1]\n"
+         "print(f'corr(margin, breach probability): {corr_margin:+.3f}')\n"
+         "company_survival[['ticker', 'company', 'country', 'baseline_operating_margin',\n"
+         "                  'p_breach_ever_12mo']].sort_values('p_breach_ever_12mo', ascending=False)"),
+
+    md("## 7. Next steps\n\n"
+       "- Calibrate crude-to-pump beta for India, China, Germany, Brazil directly (Eurostat oil "
+       "bulletin, PPAC, NDRC, ANP), replacing the remaining v0 estimates; only the US beta is "
+       "empirically calibrated so far.\n"
+       "- Add CapitalIQ coverage as an optional upgrade once available, mainly for deeper "
+       "history and cleaner GICS-based screening, not required for the project to stand on its "
+       "own.\n"
        "- 2022 oil-spike backtest: which real companies recovered fastest, and what did they have "
        "in common (scale, contract mix, hedging)?\n"
        "- Bounded food-price section: transport share of food retail price times shock scenario."),

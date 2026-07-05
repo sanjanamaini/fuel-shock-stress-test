@@ -7,3 +7,4 @@ jupyter
 nbclient
 nbconvert
 ipykernel
+yfinance>=0.2

@@ -23,19 +23,22 @@ data/licensed/    Bloomberg / CapitalIQ exports (NOT committed, see licensing no
 charts/           exported figures
 ```
 
-## Licensing note
+## Data and licensing
 
-Bloomberg, CapitalIQ and PitchBook data are licensed and are never committed to this repository. The public repo contains methodology, code, public-source data and aggregated or derived outputs only. `data/licensed/` is gitignored.
+Built entirely on free, public data: EIA (crude and diesel prices) and Yahoo Finance (company financials, 22 real trucking/logistics companies across the five focus countries). No Bloomberg or CapitalIQ access is required to reproduce any result in this repository. `data/licensed/` exists as a gitignored slot for an optional future CapitalIQ upgrade (deeper company history, cleaner GICS-based screening) — nothing here depends on it, and it is never committed if used.
 
 ## Status
 
-**v0.2 (2026-07-05):** public data pipeline (Brent and WTI daily since 1986-87, US diesel weekly since 1994, all via EIA, through 2026-06-29), Excel unit economics and shock model, and a fully executed analysis notebook with real findings:
+**v0.3 (2026-07-05):** built entirely on public data — no CapitalIQ or Bloomberg access is required or used. Public data pipeline (Brent and WTI daily since 1986-87, US diesel weekly since 1994, all via EIA), a real 22-company screen (Yahoo Finance, free), Excel unit economics and shock model, and a fully executed analysis notebook.
 
-- **US crude-to-pump beta, empirically calibrated: 0.36** (13-week percent-change regression, R-squared 0.51, n=1,672). This replaces a v0 guess of 0.90, retail diesel absorbs crude moves far more slowly than intuition suggests.
-- **Mean-reverting Monte Carlo on Brent** (Ornstein-Uhlenbeck, calibrated 2010-present: half-life 0.87 years, long-run mean $73/bbl), 10,000 simulated 12-month paths.
-- **Headline finding:** Brazil has a 42% chance of breaching zero EBIT margin within 12 months; the US has effectively none. Ranking (Brazil > China > India > Germany > US) is driven by each country's fuel share of revenue and margin cushion, not the size of the shock, which is identical across countries in the simulation. See `charts/03_vulnerability_ranking.png`.
+**Two real findings:**
 
-India, China, Germany and Brazil crude-to-pump betas and the CapitalIQ company screen are still pending (see notebook section 6 and section 3 respectively) — current results use one representative operator per country from v0 Excel assumptions, not yet the actual distribution of real companies.
+1. **73% of real public trucking/logistics companies analyzed (16 of 22) have more than a 5% chance of breaching zero operating margin within 12 months** under a mean-reverting Monte Carlo simulation of Brent crude. That is the headline number this project set out to find.
+2. **Margin discipline predicts survival far better than country or company scale does.** Correlation between a company's baseline operating margin and its breach probability is -0.75; scale (log revenue) is a much weaker, messier predictor (-0.34 overall, -0.65 within the US-only subsample). Old Dominion Freight Line (23.8% margin) has essentially zero measured breach risk despite being mid-sized; Knight-Swift, similar revenue but 1.2% margin, has a 56% breach probability. **Scale only protects when paired with margin discipline — size alone is not a shield.** See `charts/04_scale_vs_margin_vs_breach.png`.
+
+Also calibrated: the **US crude-to-pump beta is empirically 0.36** (13-week percent-change regression, R-squared 0.51, n=1,672), replacing a v0 guess of 0.90 — retail diesel absorbs crude moves far more slowly than intuition suggests. And a country-level result: at the representative-operator level, Brazil has a 42% chance of breaching zero margin within 12 months vs effectively none for the US (`charts/03_vulnerability_ranking.png`) — superseded in nuance by the company-level finding above, but still a valid structural read on fuel-tax-wedge exposure.
+
+**Open items:** India/China/Germany/Brazil crude-to-pump betas still use v0 estimates (only the US is empirically calibrated); a 2022 oil-spike backtest; a bounded food-price section. CapitalIQ remains a possible future upgrade for deeper company history, not a blocker.
 
 ## Tech
 
