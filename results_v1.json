@@ -1,0 +1,56 @@
+{
+ "ou": {
+  "theta": 0.7989966448098124,
+  "mu_log": 4.2935057317364995,
+  "mu_level": 73.22271827298799,
+  "sigma_annual": 0.4326177727171145,
+  "last_price": 71.59
+ },
+ "ou_half_life_years": 0.8675220165973754,
+ "v03_companies": 22,
+ "v03_over5pct": 16,
+ "v03_corr_margin": -0.7491224473180459,
+ "v03_corr_logrev": -0.33715571043212034,
+ "rank_corr_distance_breach": -1.0,
+ "passthrough_long_run": 0.7037917611586861,
+ "ecm_alpha": -0.015367868472480516,
+ "ecm_up_5wk": 0.33213212533070163,
+ "ecm_down_5wk": 0.35583319695453186,
+ "ecm_asymmetry_p": 0.8352756672555944,
+ "ecm_weeks": 1654,
+ "diesel_2026_peak_actual": 5.643,
+ "diesel_2026_peak_model": 4.288654370313494,
+ "diesel_2026_max_gap": 0.32399098552316463,
+ "shock_brent_feb_apr": 0.6545699493560169,
+ "shock_diesel_feb_apr": 0.4779367318154337,
+ "shock_ratio": 0.7301537937780989,
+ "rolling_windows": 23,
+ "rolling_windows_no_reversion": 2,
+ "rolling_half_life_min": 0.24664133673367472,
+ "rolling_half_life_max": 4.804898087353603,
+ "half_life_sensitivity": [
+  {
+   "half_life_years": 0.5,
+   "companies_over_5pct": 15
+  },
+  {
+   "half_life_years": 0.87,
+   "companies_over_5pct": 16
+  },
+  {
+   "half_life_years": 2.0,
+   "companies_over_5pct": 17
+  },
+  {
+   "half_life_years": 4.0,
+   "companies_over_5pct": 18
+  }
+ ],
+ "backtest_companies": 20,
+ "backtest_negative_margin_2026q2": 0,
+ "backtest_negative_any_2026": 0,
+ "backtest_margin_rose_yoy": 16,
+ "backtest_model_predicted_negative": 10,
+ "backtest_mean_model_hit": 0.07601497092631546,
+ "backtest_median_actual_change": 0.011797735056537697
+}
